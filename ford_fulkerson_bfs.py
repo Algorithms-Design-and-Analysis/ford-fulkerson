@@ -1,50 +1,27 @@
-def dfs(matriz_adyacencia):
-    camino = []
-    visitados = [False] * len(matriz_adyacencia)
-    stack = [0]
-    while len(stack) > 0:
-        entro = False
-        v = stack.pop()
-        if not visitados[v]:
-            if v not in camino:
-                camino.append(v)
-            if v == len(matriz_adyacencia)-1:
-                break
-            visitados[v] = True
-            for w in range(len(matriz_adyacencia[v])):
-                if matriz_adyacencia[v][w] != None and matriz_adyacencia[v][w][1]-matriz_adyacencia[v][w][0] > 0 and not visitados[w]:
-                    stack.append(w)
-                    entro = True
-                    break
-            if not entro:
-                camino.pop(-1)
-                if len(camino)>0:
-                    stack.append(camino[-1])
-                    visitados[camino[-1]] = False
-
-            camino_limpio = []
-            for nodo in camino:
-                if nodo not in camino_limpio:
-                    camino_limpio.append(nodo)
-            camino = camino_limpio
-            
-
-
-    if len(matriz_adyacencia)-1 not in camino:
-        camino = []
-            
-    camino_limpio = []
-    for nodo in camino:
-        if nodo not in camino_limpio:
-            camino_limpio.append(nodo)
-            
-    return camino_limpio
+def bfs(matriz_adyacencia):
+    
+    camino = []    
+    queue = [[0]] 
+    vecinos = [[]]
+    while len(queue) > 0:
+     camino_actual = queue.pop(0)
+     v = camino_actual[-1]
+     if v == len(matriz_adyacencia)-1:
+        break
+     for w in range(len(matriz_adyacencia[v])):
+        if matriz_adyacencia[v][w] != None and matriz_adyacencia[v][w][1]-matriz_adyacencia[v][w][0] > 0 and w not in vecinos[-1]:
+                    nuevo_camino = camino_actual + [w]
+                    queue.append(nuevo_camino)
+                    vecinos.append(nuevo_camino)
+    for i in vecinos:
+        if len(matriz_adyacencia)-1 in i:
+            camino = camino_actual
+    return camino
 
 def ford_fulkerson(matriz_ayacencia):
 
     flujo_maximo = 0
-    camino = dfs(matriz_ayacencia)
-    
+    camino = bfs(matriz_ayacencia)
     while len(camino) > 0:
         #print(camino)
         nodo_inicial_indice = 0
@@ -63,7 +40,7 @@ def ford_fulkerson(matriz_ayacencia):
             matriz_ayacencia[camino[nodo_final_indice]][camino[nodo_inicial_indice]][0] -= bottleneck
             nodo_inicial_indice += 1
             nodo_final_indice += 1
-        camino = dfs(matriz_ayacencia) 
+        camino = bfs(matriz_ayacencia) 
 
     return flujo_maximo
 
@@ -79,7 +56,6 @@ def main():
             nodo_inicial, nodo_final, capacidad = int(arco[0]), int(arco[1]), int(arco[2])
             matriz_adyacencia[nodo_inicial][nodo_final] = [0, capacidad]
             matriz_adyacencia[nodo_final][nodo_inicial] = [0, 0]
-        #print(matriz_adyacencia)
         print(ford_fulkerson(matriz_adyacencia))
 
 if __name__=='__main__':
